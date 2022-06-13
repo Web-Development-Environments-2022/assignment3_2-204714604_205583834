@@ -17,4 +17,30 @@ router.get("/:recipeId", async (req, res, next) => {
   }
 });
 
+
+
+//-----------------------Custom Code-----------------------------
+router.post("/recipePreview", async (req, res, next) => {
+  let recipe_id=req.body.recipeId;
+  let username=req.body.username
+  try {
+    const recipe = await recipes_utils.getRecipeDetails2(recipe_id,username);
+    res.send(recipe);
+} catch (error) {
+    next(error);
+} 
+});
+
+
+router.post("/random", async (req,res,next)=>{
+  let x=3;
+  let y=3;
+  try {
+    const recipe = await recipes_utils.getRecipeDetails2(recipe_id,username);
+    res.send(recipe);
+} catch (error) {
+    next(error);
+} 
+});
+
 module.exports = router;
