@@ -83,13 +83,46 @@ exports.getRecipeDetails2 = getRecipeDetails2;
 
 
 async function getRandomRecipes(recipesNumber){
-    return await axios.get(`${api_domain}/random`, {
+    const response= await axios.get(`${api_domain}/random`, {
         params: {
             number: recipesNumber,
             apiKey: process.env.spooncular_apiKey
         }
 
     });
+    return response.data;
 }
 
+
 exports.getRandomRecipes = getRandomRecipes;
+
+async function getExtendedRecipeDetails(recipe_id) {
+    let recipe_info = await getRecipeInformation(recipe_id);
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
+    let {extendedIngredients,instructions,servings}= recipe_info.data
+    return {
+        id: id,
+        title: title,
+        readyInMinutes: readyInMinutes,
+        image: image,
+        popularity: aggregateLikes,
+        vegan: vegan,
+        vegetarian: vegetarian,
+        glutenFree: glutenFree,
+        extendedIngredients: extendedIngredients,
+        instructions: instructions,
+        servings:servings
+    }
+}
+exports.getExtendedRecipeDetails = getExtendedRecipeDetails;
+
+async function getSearchResults(query,number,cuisine,diet,intolerances) {
+    const response= await axios.get(`${api_domain}/complexSearch/?query=${query}&number-${number}&cuisine-${cuisine}&diet=${diet}&intolerances=${intolerances}`, {
+        params: {
+            number: recipesNumber,
+            apiKey: process.env.spooncular_apiKey
+        }
+
+    });
+    return response.data;
+}

@@ -33,10 +33,21 @@ router.post("/recipePreview", async (req, res, next) => {
 
 
 router.post("/random", async (req,res,next)=>{
-  let x=3;
-  let y=3;
+let recipesNumber=req.body.recipesNumber
   try {
-    const recipe = await recipes_utils.getRecipeDetails2(recipe_id,username);
+    const recipess = await recipes_utils.getRandomRecipes(recipesNumber);
+    res.send(recipess);
+} catch (error) {
+    next(error);
+} 
+});
+
+
+router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
+  //let recipe_id=req.body.recipeId;
+  let recipeId=req.params.recipeId;
+  try {
+    const recipe = await recipes_utils.getExtendedRecipeDetails(recipeId);
     res.send(recipe);
 } catch (error) {
     next(error);
@@ -44,3 +55,6 @@ router.post("/random", async (req,res,next)=>{
 });
 
 module.exports = router;
+
+
+router.get()
