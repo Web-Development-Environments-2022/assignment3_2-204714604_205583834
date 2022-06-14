@@ -33,15 +33,22 @@ router.post("/recipePreview", async (req, res, next) => {
 
 
 router.post("/random", async (req,res,next)=>{
-let recipesNumber=req.body.recipesNumber
   try {
-    const recipess = await recipes_utils.getRandomRecipes(recipesNumber);
-    res.send(recipess);
+    let recipes = await recipes_utils.getRandomThreeRecipes();
+    res.send(recipes);
 } catch (error) {
     next(error);
 } 
 });
 
+// router.get("/random", async (req, res, next) => {
+//   try {
+//     let random_3_recipe = await recipes_utils.getRandomThreeRecipes();
+//     res.send(random_3_recipe);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
   //let recipe_id=req.body.recipeId;
@@ -55,3 +62,31 @@ router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
 });
 
 module.exports = router;
+
+router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
+  //let recipe_id=req.body.recipeId;
+  let recipeId=req.params.recipeId;
+  try {
+    const recipe = await recipes_utils.getExtendedRecipeDetails(recipeId);
+    res.send(recipe);
+} catch (error) {
+    next(error);
+} 
+});
+
+router.get("/search/:query/:number/:cuisine/:diet/:intolerances",async (req, res, next) => {
+  let query=req.params.query;
+  let number=req.params.number;
+  let cuisine=req.params.cuisine;
+  let diet=req.params.diet;
+  let intolerances=req.params.intolerances;
+
+
+
+  try {
+    const recipe = await recipes_utils.getSearchResults(query,number,cuisine,diet,intolerances);
+    res.send(re);
+} catch (error) {
+    next(error);
+} 
+});  
