@@ -55,6 +55,3 @@ router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
 });
 
 module.exports = router;
-
-
-router.get()

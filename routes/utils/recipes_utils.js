@@ -18,6 +18,11 @@ async function getRecipeInformation(recipe_id) {
     });
 }
 
+// Add a new recipe.
+async function addNewRecipe(user_id, recipe_id, recipe_name, cook_time, recipe_pic, vege, vegan, gluten_free, like, dishs_num){
+    await DButils.execQuery(`insert into Recipes values ('${user_id}',${recipe_id})`);
+}
+
 
 
 async function getRecipeDetails(recipe_id) {
