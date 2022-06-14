@@ -21,3 +21,5 @@ async function getUserRecipes(user_id){
 
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
+exports.checkUserDetails=checkUserDetails;
+exports.getUserRecipes=getUserRecipes;

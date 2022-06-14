@@ -51,7 +51,22 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
+router.post('/logincheck', async (req,res,next) => {
+  try{
+    let username=req.body.username; //change to session!!!!
+    let password=req.body.password;
+    isApproved=checkUserDetails(username,password);
+    if (isApproved){
+      res.status(200).send("The login succecssful");
+    }
+    else{
+      res.status(404).send("username or password not correct");
 
+    }
+  } catch(error){
+    next(error); 
+  }
+});
 
 
 module.exports = router;
