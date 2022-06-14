@@ -1,7 +1,8 @@
 var express = require("express");
 var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
-
+const user_utils = require("./utils/user_utils");
+recipe_ids_counter=1;
 router.get("/", (req, res) => res.send("im here"));
 
 
@@ -61,8 +62,6 @@ router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
 } 
 });
 
-module.exports = router;
-
 router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
   //let recipe_id=req.body.recipeId;
   let recipeId=req.params.recipeId;
@@ -94,24 +93,49 @@ router.get("/search/:query/:number/:cuisine/:diet/:intolerances",async (req, res
 router.post('/private', async (req,res,next) => {
   try 
   {
-    // Extracts all the parameters from the body
     const dishesNumber = req.body.dishesNumber;
-    const ingredients = req.body.ingredients;
     const instructions = req.body.instructions;
-    const type_of_food = req.body.type_of_food;
     const gluten_free = req.body.gluten_free;
     const recipePic = req.body.recipePic;
-    const name = req.body.name;
+    const recipeName = req.body.name;
     const likes = req.body.likes;
     const cookingTime = req.body.cookingTime;
     const vegan = req.body.vegan;
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
+    const recipeID=req.body.recipeID;
 
-    // Creates the recipe and saves it
-    const recipes = await user_utils.createRecipe(dishesNumber, ingredients, instructions, type_of_food, gluten_free, recipePic, name, likes, cookingTime, vegan, vegetarian, user_id);
-    res.send(recipes.data);
+    await user_utils.createRecipe(user_id,dishesNumber, instructions, gluten_free, recipePic, likes, cookingTime, vegan, vegetarian,recipeID,recipeName);
+    res.status(200).send("The Recipe upload successful");
 } catch (error) {
   next(error);
 }
 });
+
+router.post('/watched', async (req,res,next) => {
+  try 
+  {
+    const user_id = req.session.user_id;
+    const recipeID=req.body.recipeID;
+
+    await user_utils.addtoHistory(user_id,recipeID);
+    res.status(200).send("The Recipe recorded in the history");
+} catch (error) {
+  next(error);
+}
+});
+
+router.post('/favorite', async (req,res,next) => {
+  try 
+  {
+    const user_id = req.session.user_id;
+    const recipeID=req.body.recipeID;
+
+    await user_utils.addtoFavorites(user_id,recipeID);
+    res.status(200).send("The Recipe uploaded to favorite");
+} catch (error) {
+  next(error);
+}
+});
+
+module.exports = router;

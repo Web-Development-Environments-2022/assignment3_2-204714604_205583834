@@ -54,6 +54,7 @@ var port = process.env.PORT || "80"; //local=3000 remote=80
 const user = require("./routes/user");
 const recipes = require("./routes/recipes");
 const auth = require("./routes/auth");
+const { getRecipeDetails } = require("./routes/utils/recipes_utils");
 
 
 //#region cookie middleware
