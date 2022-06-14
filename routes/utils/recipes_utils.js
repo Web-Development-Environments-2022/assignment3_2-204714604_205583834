@@ -208,27 +208,4 @@ async function getRandomThreeRecipes(){
 
 exports.getRandomThreeRecipes = getRandomThreeRecipes;
 
-router.post('/private', async (req,res,next) => {
-    try 
-    {
-      // Extracts all the parameters from the body
-      const dishesNumber = req.body.dishesNumber;
-      const ingredients = req.body.ingredients;
-      const instructions = req.body.instructions;
-      const type_of_food = req.body.type_of_food;
-      const gluten_free = req.body.gluten_free;
-      const recipePic = req.body.recipePic;
-      const name = req.body.name;
-      const likes = req.body.likes;
-      const cookingTime = req.body.cookingTime;
-      const vegan = req.body.vegan;
-      const vegetarian = req.body.vegetarian;
-      const user_id = req.session.user_id;
-  
-      // Creates the recipe and saves it
-      const recipes = await user_utils.createRecipe(dishesNumber, ingredients, instructions, type_of_food, gluten_free, recipePic, name, likes, cookingTime, vegan, vegetarian, user_id);
-      res.send(recipes.data);
-  } catch (error) {
-    next(error);
-  }
-});
+
