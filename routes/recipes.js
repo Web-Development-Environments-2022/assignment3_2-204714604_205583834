@@ -18,8 +18,6 @@ router.get("/:recipeId", async (req, res, next) => {
   }
 });
 
-
-
 //-----------------------Custom Code-----------------------------
 router.post("/recipePreview", async (req, res, next) => {
   let recipe_id=req.body.recipeId;
@@ -35,7 +33,7 @@ router.post("/recipePreview", async (req, res, next) => {
 
 router.post("/random", async (req,res,next)=>{
   try {
-    let recipes = await recipes_utils.getRandomThreeRecipes();
+    let recipes = await recipes_utils.getRandomThreeRecipes(req.session.user_id);
     res.send(recipes);
 } catch (error) {
     next(error);
@@ -52,21 +50,10 @@ router.post("/random", async (req,res,next)=>{
 // });
 
 router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
-  //let recipe_id=req.body.recipeId;
+  let user_id=req.session.user_id;
   let recipeId=req.params.recipeId;
   try {
-    const recipe = await recipes_utils.getExtendedRecipeDetails(recipeId);
-    res.send(recipe);
-} catch (error) {
-    next(error);
-} 
-});
-
-router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
-  //let recipe_id=req.body.recipeId;
-  let recipeId=req.params.recipeId;
-  try {
-    const recipe = await recipes_utils.getExtendedRecipeDetails(recipeId);
+    const recipe = await recipes_utils.getExtendedRecipeDetails(user_id,recipeId);
     res.send(recipe);
 } catch (error) {
     next(error);
@@ -74,30 +61,33 @@ router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
 });
 
 router.get("/search/:query/:number/:cuisine/:diet/:intolerances",async (req, res, next) => {
+  let user_id=req.session.user_id;
   let query=req.params.query;
   let number=req.params.number;
   let cuisine=req.params.cuisine;
   let diet=req.params.diet;
   let intolerances=req.params.intolerances;
-
-
-
   try {
     const recipe = await recipes_utils.getSearchResults(query,number,cuisine,diet,intolerances);
-    res.send(recipe.get);
+    temp=[];
+    for (let i=0;i<recipe.results.length;i++){
+      let c=await recipes_utils.getRecipeDetails2(recipe.results[i].id,user_id);
+      temp.push(c);
+    }
+    res.send(temp);
 } catch (error) {
     next(error);
 } 
 });  
 
-router.post('/private', async (req,res,next) => {
+router.post('/addPrivateRecipe', async (req,res,next) => {
   try 
   {
     const dishesNumber = req.body.dishesNumber;
     const instructions = req.body.instructions;
     const gluten_free = req.body.gluten_free;
     const recipePic = req.body.recipePic;
-    const recipeName = req.body.name;
+    const recipeName = req.body.recipeName;
     const likes = req.body.likes;
     const cookingTime = req.body.cookingTime;
     const vegan = req.body.vegan;
@@ -117,7 +107,6 @@ router.post('/watched', async (req,res,next) => {
   {
     const user_id = req.session.user_id;
     const recipeID=req.body.recipeID;
-
     await user_utils.addtoHistory(user_id,recipeID);
     res.status(200).send("The Recipe recorded in the history");
 } catch (error) {
@@ -130,7 +119,6 @@ router.post('/favorite', async (req,res,next) => {
   {
     const user_id = req.session.user_id;
     const recipeID=req.body.recipeID;
-
     await user_utils.addtoFavorites(user_id,recipeID);
     res.status(200).send("The Recipe uploaded to favorite");
 } catch (error) {
@@ -139,3 +127,6 @@ router.post('/favorite', async (req,res,next) => {
 });
 
 module.exports = router;
+
+
+

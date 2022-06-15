@@ -56,7 +56,6 @@ const recipes = require("./routes/recipes");
 const auth = require("./routes/auth");
 const { getRecipeDetails } = require("./routes/utils/recipes_utils");
 
-
 //#region cookie middleware
 app.use(function (req, res, next) {
   if (req.session && req.session.user_id) {
@@ -88,8 +87,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500).send({ message: err.message, success: false });
 });
 
-
-
 const server = app.listen(port, () => {
   console.log(`Server listen on port ${port}`);
 });
@@ -100,5 +97,3 @@ process.on("SIGINT", function () {
   }
   process.exit();
 });
-
-// ------------------------------------------------------------- Test -------------------------------------------------------------------

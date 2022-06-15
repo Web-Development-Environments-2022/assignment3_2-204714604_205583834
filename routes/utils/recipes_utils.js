@@ -1,5 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
+const user_utils = require("./user_utils");
 
 
 
@@ -7,7 +8,6 @@ const api_domain = "https://api.spoonacular.com/recipes";
  * Get recipes list from spooncular response and extract the relevant recipe data for preview
  * @param {*} recipes_info 
  */
-
 
 async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
@@ -18,13 +18,9 @@ async function getRecipeInformation(recipe_id) {
     });
 }
 
-
-
-
 async function getRecipeDetails(recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
-
     return {
         id: id,
         title: title,
@@ -36,19 +32,16 @@ async function getRecipeDetails(recipe_id) {
         glutenFree: glutenFree,
     }
 }
-
-
 exports.getRecipeDetails = getRecipeDetails;
 
+//-----------------------------------------------------------------------Custom Code-----------------------------------------------------------------------
 
-//-------------------------------Custom Code------------------------------
-
-async function isrFavoriteRecipe(recipe_id,username){
+async function isrFavoriteRecipe(recipe_id, username){
     //return true if (recipe_id,username) exist in Favorites Table
     //else return False
-    recipes_id=getFavoriteRecipes(username);
+    let recipes_id=await user_utils.getFavoriteRecipes(username);
     for (let i=0;i<recipes_id.length;i++){
-        if (recipes_id[i]===recipe_id){
+        if (recipes_id[i].recipe_id===parseInt(recipe_id)){
             return true;
         }
     }
@@ -56,21 +49,20 @@ async function isrFavoriteRecipe(recipe_id,username){
 }
 
 async function isClickedByUser(recipe_id,username){
-    //return true if (recipe_id,username) exist in ClickedRecipes Table
-    //else return False
-    //TODO: Implement function
-
+    let recipes_id=await user_utils.getHistoryRecipes(username);
+    for (let i=0;i<recipes_id.length;i++){
+        if (recipes_id[i].recipe_id===parseInt(recipe_id)){
+            return true;
+        }
+    }
     return false;
 }
-
-
 
 async function getRecipeDetails2(recipe_id,username) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
     let recipeClickedByUser=await isClickedByUser(recipe_id,username);
     let recipeFavoriteByUser=await isrFavoriteRecipe(recipe_id,username);
-
     return {
         id: id,
         title: title,
@@ -84,25 +76,9 @@ async function getRecipeDetails2(recipe_id,username) {
         isFavorite:recipeFavoriteByUser
     }
 }
-
 exports.getRecipeDetails2 = getRecipeDetails2;
 
-
-// async function getRandomRecipes(recipesNumber){
-//     const response= await axios.get(`${api_domain}/random`, {
-//         params: {
-//             number: recipesNumber,
-//             apiKey: process.env.spooncular_apiKey
-//         }
-
-//     });
-//     return response.data;
-// }
-
-
-exports.getRandomRecipes = getRandomRecipes;
-
-async function getExtendedRecipeDetails(recipe_id) {
+async function getExtendedRecipeDetails(recipe_id,user_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
     let {extendedIngredients,instructions,servings}= recipe_info.data
@@ -115,44 +91,48 @@ async function getExtendedRecipeDetails(recipe_id) {
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
+        isClicked:await isClickedByUser(user_id,recipe_id),
+        isFavorite:await isrFavoriteRecipe(user_id,recipe_id),
         extendedIngredients: extendedIngredients,
         instructions: instructions,
         servings:servings
+        
     }
 }
 exports.getExtendedRecipeDetails = getExtendedRecipeDetails;
 
-function extarctRecipesPreviewDetails(recipes_info){
+function extarctRecipesPreviewDetails(recipes_info,user_id){
     return recipes_info.map((recipe_info) => {
         let data = recipe_info;
+        // let recipeClickedByUser=await isClickedByUser(id,user_id);
+        // let recipeFavoriteByUser=await isrFavoriteRecipe(id,user_id);
         if(recipe_info.data) {
             data = recipe_info.data;
         }
         const {
             id,
-            title,
-            readyInMinutes,
             image,
             aggregateLikes,
             vegan,
             vegetarian,
             glutenFree,
         } = data;
+        
         return{
             id: id,
             title: title,
             readyInMinutes: readyInMinutes,
             image: image,
-            // popularity: popularity,
             popularity: aggregateLikes,
             vegan: vegan,
             vegetarian: vegetarian,
             glutenFree: glutenFree,
+            isClicked:recipeClickedByUser,
+            isFavorite:recipeFavoriteByUser
         }
     })    
 }
-
-
+exports.extarctRecipesPreviewDetails = extarctRecipesPreviewDetails;
 
 async function getSearchResults(query,number,cuisine,diet,intolerances) {
     const response= await axios.get(`${api_domain}/complexSearch/`, {
@@ -164,7 +144,6 @@ async function getSearchResults(query,number,cuisine,diet,intolerances) {
             intolerances:intolerances,
             apiKey: process.env.spooncular_apiKey
         }
-
     });
     return response.data;
 }
@@ -180,7 +159,6 @@ async function getRandomRecipes() {
     });
     return response;
 }
-
 exports.getRandomRecipes = getRandomRecipes;
 
 async function getPrevByRecipe(recipe){
@@ -188,7 +166,9 @@ async function getPrevByRecipe(recipe){
     return  { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree }
 
 }
-async function getRandomThreeRecipes(){
+exports.getPrevByRecipe = getPrevByRecipe;
+
+async function getRandomThreeRecipes(user_id){
     let random_pool = await getRandomRecipes();
     let filterd_random_pool = random_pool.data.recipes.filter((random) => (random.instructions != "") && (random.image && random.title
          && random.readyInMinutes && random.servings && random.extendedIngredients && random.servings && random.aggregateLikes
@@ -199,14 +179,24 @@ async function getRandomThreeRecipes(){
     let info1=random_pool.data.recipes[0];
     let info2=random_pool.data.recipes[1];
     let info3=random_pool.data.recipes[2];
-
-    return extarctRecipesPreviewDetails([info1,info2,info3]);
+    recipe=[info1,info2,info3];
+    temp=[]
+    for (let i=0;i<recipe.length;i++){
+        let c=await getRecipeDetails2(recipe[i].id,user_id);
+        temp.push(c);
+      }
+      return temp;
     //need to extract preview
-
-    
 }
-
-
 exports.getRandomThreeRecipes = getRandomThreeRecipes;
 
-
+async function getPrevByIdList(ID_LST, user_id){
+    res=[];
+    for (let i = 0; i < ID_LST.length; i++){
+      res.push(getRecipeDetails2(ID_LST[i], user_id));
+    }
+    return res;
+  }
+  exports.getPrevByIdList = getPrevByIdList;
+  exports.isClickedByUser = isClickedByUser;
+  exports.isrFavoriteRecipe = isrFavoriteRecipe;
