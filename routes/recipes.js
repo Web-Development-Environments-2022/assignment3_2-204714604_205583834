@@ -5,7 +5,6 @@ const user_utils = require("./utils/user_utils");
 recipe_ids_counter=1;
 router.get("/", (req, res) => res.send("im here"));
 
-
 /**
  * This path returns a full details of a recipe by its id
  */
@@ -94,7 +93,6 @@ router.post('/addPrivateRecipe', async (req,res,next) => {
     const vegetarian = req.body.vegetarian;
     const user_id = req.session.user_id;
     const recipeID=req.body.recipeID;
-
     await user_utils.createRecipe(user_id,dishesNumber, instructions, gluten_free, recipePic, likes, cookingTime, vegan, vegetarian,recipeID,recipeName);
     res.status(200).send("The Recipe upload successful");
 } catch (error) {
@@ -127,6 +125,3 @@ router.post('/favorite', async (req,res,next) => {
 });
 
 module.exports = router;
-
-
-

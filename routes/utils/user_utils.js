@@ -32,15 +32,13 @@ async function createRecipe(user_id, dishesNumber, instructions, gluten_free, re
 
 async function addtoHistory(user_id,recipeID){
     let temp= await DButils.execQuery(`SELECT * FROM history_search WHERE user_id = '${user_id}' AND recipe_id = '${recipeID}'` )
-    let counter=temp.length
+    let counter=temp.length;
     await DButils.execQuery(`insert into history_search values (${user_id}, ${recipeID},${counter})`);
 }
 
 async function addtoFavorites(user_id,recipeID){
     await DButils.execQuery(`insert into favoriterecipes values (${user_id}, ${recipeID})`);
 }
-
-
 
 async function getRecipePrevSQL(recipe,user_id){
     let DishesNumber= await DButils.execQuery(`select DishesNumber from Recipes where recipe_id='${recipe.recipe_id}'`);
@@ -56,7 +54,6 @@ async function getRecipePrevSQL(recipe,user_id){
     let RecipeName= await DButils.execQuery(`select RecipeName from Recipes where recipe_id='${recipe.recipe_id}'`);
     let isclcicked=await recipe_utils.isClickedByUser(RecipeID,user_id);
     let isFavorite=await recipe_utils.isClickedByUser(RecipeID,user_id);
-
 
     return{
         UserID:UserID[0].user_id,

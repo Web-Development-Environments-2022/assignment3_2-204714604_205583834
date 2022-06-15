@@ -78,7 +78,7 @@ router.get("/getWatched",async (req, res, next) => {
   let user_id = req.session.user_id;
   try {
     const recipes = await user_utils.getHistoryRecipes(user_id);
-    temp=[]
+    temp=[];
     for (let i=0;i<recipes.length;i++){
         let c=await recipe_utils.getRecipeDetails2(recipes[i].recipe_id,user_id);
         temp.push(c);
@@ -120,7 +120,7 @@ router.get("/writtenby", async (req, res, next) => {
   let user_id=req.session.user_id;
   try {
     let recipes= await user_utils.getUserRecipes(user_id);
-    temp=[]
+    temp=[];
     for (let i=0;i<recipes.length;i++){
         let c=await user_utils.getRecipePrevSQL(recipes[i],user_id);
         temp.push(c);
@@ -131,20 +131,14 @@ router.get("/writtenby", async (req, res, next) => {
 } 
 });
 
-module.exports = router;
-
 router.get("/getLastThreeViewed", async (req, res, next) => {
   let user_id=req.session.user_id;
   try {
     let recipes= await user_utils.getHistoryRecipes(user_id);
-      res.send([recipes[0],recipes[1],recipes[2]])
-    
-
-
+      res.send([recipes[0],recipes[1],recipes[2]]);
 } catch (error) {
     next(error);
 } 
 });
-
 
 module.exports = router;
