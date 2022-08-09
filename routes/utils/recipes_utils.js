@@ -132,15 +132,33 @@ function extarctRecipesPreviewDetails(recipes_info,user_id){
 exports.extarctRecipesPreviewDetails = extarctRecipesPreviewDetails;
 
 async function getSearchResults(query,number,cuisine,diet,intolerances) {
+    let paramsObj={
+        query:query,
+        number:number,
+        apiKey: process.env.spooncular_apiKey    
+    }
+    if (cuisine!=null){
+        paramsObj.cuisine=cuisine
+    }
+
+    if (diet!=null){
+        paramsObj.diet=diet
+    }
+
+    if (intolerances!=null){
+        paramsObj.intolerances=intolerances
+    }
+    
     const response= await axios.get(`${api_domain}/complexSearch/`, {
-        params: {
-            query:query,
-            number:number,
-            cuisine:cuisine,
-            diet:diet,
-            intolerances:intolerances,
-            apiKey: process.env.spooncular_apiKey
-        }
+        // params: {
+        //     query:query,
+        //     number:number,
+        //     cuisine:cuisine,
+        //     diet:diet,
+        //     intolerances:intolerances,
+        //     apiKey: process.env.spooncular_apiKey
+        // }
+        params:paramsObj
     });
     return response.data;
 }

@@ -66,6 +66,15 @@ router.get("/search/:query/:number/:cuisine/:diet/:intolerances",async (req, res
   let cuisine=req.params.cuisine;
   let diet=req.params.diet;
   let intolerances=req.params.intolerances;
+  if (cuisine=="null"){
+    cuisine=null;
+  }
+  if (diet=="null"){
+    diet=null;
+  }
+  if (intolerances=="null"){
+    intolerances=null;
+  }
   try {
     const recipe = await recipes_utils.getSearchResults(query,number,cuisine,diet,intolerances);
     temp=[];
@@ -77,7 +86,7 @@ router.get("/search/:query/:number/:cuisine/:diet/:intolerances",async (req, res
 } catch (error) {
     next(error);
 } 
-});  
+}); 
 
 router.post('/addPrivateRecipe', async (req,res,next) => {
   try 
