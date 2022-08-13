@@ -2,11 +2,14 @@ const DButils = require("./DButils");
 const recipe_utils = require("./recipes_utils");
 
 async function markAsFavorite(user_id, recipe_id){
-    await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`);
+    user_id=await DButils.execQuery(`select user_id from users where username='${user_id}'`); //comment when using cookie
+    user_id=user_id[0].user_id; //comment when using cookie
+
+    await DButils.execQuery(`insert into favoriterecipes values ('${user_id}',${recipe_id})`);
 }
 
 async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from FavoriteRecipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from favoriterecipes where user_id='${user_id}'`);
     return recipes_id;
 }
 
@@ -31,9 +34,11 @@ async function createRecipe(user_id, dishesNumber, instructions, gluten_free, re
 }
 
 async function addtoHistory(user_id,recipeID){
+    user_id=await DButils.execQuery(`select user_id from users where username='${user_id}'`); //comment when using cookie
+    user_id=user_id[0].user_id;
     let temp= await DButils.execQuery(`SELECT * FROM history_search WHERE user_id = '${user_id}' AND recipe_id = '${recipeID}'` )
     let counter=temp.length;
-    await DButils.execQuery(`insert into history_search values (${user_id}, ${recipeID},${counter})`);
+    await DButils.execQuery(`insert into history_search values (${counter},${user_id}, ${recipeID})`);
 }
 
 async function addtoFavorites(user_id,recipeID){
