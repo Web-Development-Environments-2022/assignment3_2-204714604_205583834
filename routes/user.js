@@ -43,9 +43,13 @@ router.post('/favorites', async (req,res,next) => {
 /**
  * This path returns the favorites recipes that were saved by the logged-in user
  */
-router.get("/getFavorites",async (req, res, next) => {
+//  router.get("/getFavorites",async (req, res, next) => {
+router.get("/getFavorites/:user_id",async (req, res, next) => {
   let temp=[];
-  let user_id = req.session.user_id;
+  let user_id = req.params.user_id;
+  user_id=await DButils.execQuery(`select user_id from users where username='${user_id}'`); //comment when using cookie
+  user_id=user_id[0].user_id; //comment when using cookie
+
   try {
     const recipes = await user_utils.getFavoriteRecipes(user_id);
     // recipe_utils.getPrevByIdList(recipes,user_id).then((prevs) => {res.send(prevs)});
@@ -59,7 +63,7 @@ router.get("/getFavorites",async (req, res, next) => {
       res.status(200).send(temp);
     }
     else{
-      res.status(404).send("No favorite recipes");
+      res.status(204).send("No favorite recipes");
     }
 } catch (error) {
     next(error);
@@ -85,7 +89,7 @@ router.get("/getFavorites/:user_id/:recipe_id",async (req, res, next) => {
       }); 
     }
     else{
-    res.status(404).send({
+    res.status(204).send({
       isFavorite:bool
     })
     }
@@ -144,7 +148,7 @@ router.get("/getWatched/:user_id/:recipe_id",async (req, res, next) => {
       }); 
     }
     else{
-    res.status(404).send({
+    res.status(204).send({
       isWatched:bool
     })
     }
@@ -175,7 +179,7 @@ router.post('/logincheck', async (req,res,next) => {
       res.status(200).send("The login succecssful");
     }
     else{
-      res.status(404).send("username or password not correct");
+      res.status(204).send("username or password not correct");
     }
   } catch(error){
     next(error); 

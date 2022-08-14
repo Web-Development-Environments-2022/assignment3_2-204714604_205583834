@@ -61,6 +61,7 @@ async function getRecipeDetails2(recipe_id,username) {
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
     let recipeClickedByUser=await isClickedByUser(recipe_id,username);
     let recipeFavoriteByUser=await isrFavoriteRecipe(recipe_id,username);
+    let x=recipe_info.instructions;
     return {
         id: id,
         title: title,
@@ -71,7 +72,8 @@ async function getRecipeDetails2(recipe_id,username) {
         vegetarian: vegetarian,
         glutenFree: glutenFree,
         isClicked:recipeClickedByUser,
-        isFavorite:recipeFavoriteByUser
+        isFavorite:recipeFavoriteByUser,
+        instructions:recipe_info.data.instructions
     }
 }
 exports.getRecipeDetails2 = getRecipeDetails2;
