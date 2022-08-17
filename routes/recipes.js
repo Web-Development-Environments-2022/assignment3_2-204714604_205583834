@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+const DButils = require("./utils/DButils");
+
 const recipes_utils = require("./utils/recipes_utils");
 const user_utils = require("./utils/user_utils");
 recipe_ids_counter=1;
@@ -48,11 +50,18 @@ router.post("/random", async (req,res,next)=>{
 //   }
 // });
 
-router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
-  let user_id=req.session.user_id;
+// router.get("/recipeExtendedInfo/:recipeId", async (req, res, next) => {
+router.get("/recipeExtendedInfo/:recipeId/:userId", async (req, res, next) => {
+  // let user_id=req.session.user_id;
+  let user_id = req.params.userId;
+  let username=user_id;
+  if (user_id!="null"){
+  user_id=await DButils.execQuery(`select user_id from users where username='${user_id}'`); //comment when using cookie
+  user_id=user_id[0].user_id; //comment when using cookie
+}
   let recipeId=req.params.recipeId;
   try {
-    const recipe = await recipes_utils.getExtendedRecipeDetails(user_id,recipeId);
+    const recipe = await recipes_utils.getExtendedRecipeDetails(recipeId,user_id);
     res.send(recipe);
 } catch (error) {
     next(error);

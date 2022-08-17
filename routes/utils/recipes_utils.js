@@ -91,8 +91,8 @@ async function getExtendedRecipeDetails(recipe_id,user_id) {
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
-        isClicked:await isClickedByUser(user_id,recipe_id),
-        isFavorite:await isrFavoriteRecipe(user_id,recipe_id),
+        isClicked:await isClickedByUser(recipe_id,user_id),
+        isFavorite:await isrFavoriteRecipe(recipe_id,user_id),
         extendedIngredients: extendedIngredients,
         instructions: instructions,
         servings:servings
